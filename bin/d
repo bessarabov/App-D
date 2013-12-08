@@ -139,7 +139,15 @@ sub print_week {
 sub main {
     my $moment = now();
     say "";
-    say " "x4 . $moment->strftime('%Y-%m-%d %H:%M:%S');
+    say " "x4 . $moment->strftime('%Y-%m-%d %H:%M:%S') . " " . $moment->tz;
+
+    my $msk = $moment->to_tz('MSK');
+    $msk += '4h';
+    say " "x4 . $msk->strftime('%Y-%m-%d %H:%M:%S') . " " . $msk->tz;
+
+    my $bkk = $msk->to_tz('BKK');
+    $bkk += '3h';
+    say " "x4 . $bkk->strftime('%Y-%m-%d %H:%M:%S') . " " . $bkk->tz;
     say "";
 
     print_header();
