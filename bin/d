@@ -38,10 +38,11 @@ my %ru_month_names = (
     12 => 'декабрь',
 );
 
+my @weekdays = qw(Пн Вт Ср Чт Пт Сб Вс);
+
 # subs
 sub print_header {
-    my @week = qw(Пн Вт Ср Чт Пт Сб Вс);
-    print join(" ", @week) . "\n";
+    print join(" ", @weekdays) . "\n";
     return $false;
 }
 
@@ -51,8 +52,6 @@ sub print_month {
     my $first_date = delete $opts{first_date};
     my $ident = delete $opts{ident};
     my $moment = date($first_date);
-
-#    say $moment->monname() . " " . $moment->year();
 
     my $date_start = $moment->month_begin();
     my $date_end = $moment->month_end();
@@ -77,33 +76,47 @@ sub print_month {
             $day->{color} = 'red';
         }
 
-        $date += '1D';
 
         if (($day->{number} == 1)) {
-            push @week, '' foreach 1..$date->_wday()-1;
+            push @week, '' foreach 1..get_day_number($date)-1;
             $additional_text = ' 'x4 . $ru_month_names{$date->month()};
         }
 
         if (@week == 7) {
-            print_week(@week);
+            print_week(week => \@week, ident => $ident);
             print $additional_text;
             $additional_text = '';
             say '';
             undef @week;
         }
 
-
+        $date += '1D';
         push @week, $day;
     }
 
-    print_week(@week);
-    say '';
+    print_week(week => \@week, ident => $ident);
 
     return $false;
 }
 
+sub get_day_number {
+    my ($d) = @_;
+
+    return 7 if $d->wday == 1;
+    return 1 if $d->wday == 2;
+    return 2 if $d->wday == 3;
+    return 3 if $d->wday == 4;
+    return 4 if $d->wday == 5;
+    return 5 if $d->wday == 6;
+    return 6 if $d->wday == 7;
+
+    croak;
+}
+
 sub print_week {
-    my (@week) = @_;
+    my (%opts) = @_;
+    my @week = @{delete $opts{week}};
+    my $ident = delete $opts{ident};
 
     foreach (@week) {
         if (ref $_) {
@@ -114,16 +127,10 @@ sub print_week {
             } else {
                 print $text . " ";
             }
-        } else {
+        } elsif ($ident) {
             print " "x3;
         }
     }
-
-#    foreach (@week) {
-#        $_ = (" "x(2-length($_)) . $_) if length($_)<2
-#    };
-
-#    print join " ", @week;
 
     return $false;
 }
@@ -139,6 +146,7 @@ sub main {
     print_month( first_date => "2013-11-01", now => $moment, ident => $true );
     print_month( first_date => "2013-12-01", now => $moment, ident => $false );
     print_month( first_date => "2014-01-01", now => $moment, ident => $false );
+    say "";
     say "";
 }
 
