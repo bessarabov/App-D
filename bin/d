@@ -95,6 +95,7 @@ sub print_month {
     }
 
     print_week(week => \@week, ident => $ident);
+    print "\n";
 
     return $false;
 }
@@ -127,7 +128,7 @@ sub print_week {
             } else {
                 print $text . " ";
             }
-        } elsif ($ident) {
+        } else {
             print " "x3;
         }
     }
