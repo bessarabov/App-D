@@ -145,9 +145,9 @@ sub main {
     $msk += '4h';
     say " "x4 . $msk->strftime('%Y-%m-%d %H:%M:%S') . " " . $msk->tz;
 
-    my $bkk = $msk->to_tz('BKK');
-    $bkk += '3h';
-    say " "x4 . $bkk->strftime('%Y-%m-%d %H:%M:%S') . " " . $bkk->tz;
+    my $ict = $moment->to_tz('ICT');
+    $ict += '7h';
+    say " "x4 . $ict->strftime('%Y-%m-%d %H:%M:%S') . " " . $ict->tz;
     say "";
 
     print_header();
