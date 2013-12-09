@@ -10,11 +10,9 @@
 # common modules
 use strict;
 use warnings FATAL => 'all';
-use feature 'say';
 use utf8;
 use open qw(:std :utf8);
 
-use DDP; # TODO bes
 use Carp;
 use Class::Date qw(now date);
 use Term::ANSIColor qw(colored);
@@ -86,7 +84,7 @@ sub print_month {
             print_week(week => \@week, ident => $ident);
             print $additional_text;
             $additional_text = '';
-            say '';
+            print "\n";
             undef @week;
         }
 
@@ -138,24 +136,23 @@ sub print_week {
 # main
 sub main {
     my $moment = now();
-    say "";
-    say " "x4 . $moment->strftime('%Y-%m-%d %H:%M:%S') . " " . $moment->tz;
+    print "\n";
+    print " "x4 . $moment->strftime('%Y-%m-%d %H:%M:%S') . " " . $moment->tz . "\n";
 
     my $msk = $moment->to_tz('MSK');
     $msk += '4h';
-    say " "x4 . $msk->strftime('%Y-%m-%d %H:%M:%S') . " " . $msk->tz;
+    print " "x4 . $msk->strftime('%Y-%m-%d %H:%M:%S') . " " . $msk->tz . "\n";
 
     my $ict = $moment->to_tz('ICT');
     $ict += '7h';
-    say " "x4 . $ict->strftime('%Y-%m-%d %H:%M:%S') . " " . $ict->tz;
-    say "";
+    print " "x4 . $ict->strftime('%Y-%m-%d %H:%M:%S') . " " . $ict->tz . "\n";
+    print "\n";
 
     print_header();
     print_month( first_date => "2013-11-01", now => $moment, ident => $true );
     print_month( first_date => "2013-12-01", now => $moment, ident => $false );
     print_month( first_date => "2014-01-01", now => $moment, ident => $false );
-    say "";
-    say "";
+    print "\n\n";
 }
 
 main();
