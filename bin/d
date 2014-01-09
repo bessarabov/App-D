@@ -145,9 +145,6 @@ sub main {
     $msk += '4h';
     print " "x4 . $msk->strftime('%Y-%m-%d %H:%M:%S') . " " . $msk->tz . "\n";
 
-    my $ict = $moment->to_tz('ICT');
-    $ict += '7h';
-    print " "x4 . $ict->strftime('%Y-%m-%d %H:%M:%S') . " " . $ict->tz . "\n";
     print "\n";
 
     my $prev_month_first_date = ($moment-'1M')->month_begin()->strftime('%Y-%m-%d');
