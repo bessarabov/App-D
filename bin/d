@@ -123,7 +123,11 @@ sub print_week {
             my $text = sprintf("%2d", $_->{number});
 
             if ($_->{color}) {
-                print colored($text, $_->{color}) . " ";
+                if (-t STDOUT) {
+                    print colored($text, $_->{color}) . " ";
+                } else {
+                    print $text . " ";
+                }
             } else {
                 print $text . " ";
             }
