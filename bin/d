@@ -139,9 +139,13 @@ sub print_week {
     return $false;
 }
 
+sub get_now {
+    return now();
+}
+
 # main
 sub main {
-    my $moment = now();
+    my $moment = get_now();
     print "\n";
     print " "x4 . $moment->strftime('%Y-%m-%d %H:%M:%S') . " " . $moment->tz . "\n";
 
@@ -161,6 +165,6 @@ sub main {
     print_month( first_date => $next_month_first_date, now => $moment, ident => $false );
     print "\n\n";
 }
-
-main();
+main() if not caller;
+1;
 __END__
