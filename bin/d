@@ -155,7 +155,7 @@ sub main {
 
     print "\n";
 
-    my $prev_month_first_date = ($moment-'1M')->month_begin()->strftime('%Y-%m-%d');
+    my $prev_month_first_date = (($moment->month_begin()) - '1D')->month_begin()->strftime('%Y-%m-%d');
     my $cur_month_first_date = $moment->month_begin()->strftime('%Y-%m-%d');
     my $next_month_first_date = ($moment+'1M')->month_begin()->strftime('%Y-%m-%d');
 
