@@ -163,6 +163,7 @@ sub main {
             . $this_moment->strftime('%Y-%m-%d %H:%M:%S')
             . " "
             . $this_moment->tz
+            . ($tz eq $current_tz ? '  <---' : '')
             . "\n"
             ;
 
