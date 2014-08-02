@@ -90,6 +90,10 @@ sub print_month {
             undef @week;
         }
 
+        if (@week == 0 and $day->{number} == 1) {
+            print "\n";
+        }
+
         $date += '1D';
         push @week, $day;
     }
