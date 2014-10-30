@@ -193,6 +193,51 @@ sub date_2014_08_02 {
     return '';
 }
 
+sub date_2014_10_30 {
+
+    my $now = date('2014-10-30 19:39:28');
+
+    no warnings 'once';
+    no warnings 'redefine';
+    *main::get_now = sub {
+        return $now;
+    };
+
+    my $output = capture_merged {
+        main();
+    };
+
+    my $space = " ";
+
+    eq_or_diff(
+        $output,
+"
+    2014-10-30 19:39:28 UTC
+    2014-10-30 23:39:28 Europe/Moscow  <---
+
+Пн Вт Ср Чт Пт Сб Вс
+
+ 1  2  3  4  5  6  7     сентябрь
+ 8  9 10 11 12 13 14$space
+15 16 17 18 19 20 21$space
+22 23 24 25 26 27 28$space
+29 30  1  2  3  4  5     октябрь
+ 6  7  8  9 10 11 12$space
+13 14 15 16 17 18 19$space
+20 21 22 23 24 25 26$space
+27 28 29 30 31  1  2     ноябрь
+ 3  4  5  6  7  8  9$space
+10 11 12 13 14 15 16$space
+17 18 19 20 21 22 23$space
+24 25 26 27 28 29 30$space
+
+",
+        'Got correct output for date 2014-10-30',
+    );
+
+    return '';
+}
+
 sub main_in_test {
 
     require 'bin/d';
@@ -203,6 +248,7 @@ sub main_in_test {
     end_of_month();
     date_2014_05_31();
     date_2014_08_02();
+    date_2014_10_30();
 
     done_testing();
 
