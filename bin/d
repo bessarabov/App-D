@@ -15,8 +15,8 @@ use warnings FATAL => 'all';
 use utf8;
 use open qw(:std :utf8);
 
-use Carp;
-use Class::Date qw(now gmdate date);
+use Carp qw(croak);
+use Moment qw();
 use Term::ANSIColor qw(colored);
 
 # global vars
@@ -49,37 +49,35 @@ sub print_header {
 sub print_month {
     my (%opts) = @_;
     my $now = delete $opts{now};
-    my $first_date = (delete $opts{first_date})->strftime('%Y-%m-%d');
+    my $first_date = delete $opts{first_date};
     my $ident = delete $opts{ident};
-    my $moment = date($first_date);
 
-    my $date_start = $moment->month_begin();
-    my $date_end = $moment->month_end();
+    my $date_start = $first_date;
+    my $date_end = $first_date->get_month_end();
 
     my @week;
 
     my $date = $date_start;
     my $additional_text = '';
 
-    while ($date <= $date_end) {
+    while ( $date->cmp($date_end) == -1 ) {
         my $day;
 
-        $day->{number} = $date->day();
+        $day->{number} = $date->get_day();
 
         $day->{color} = 'blue' if $day->{number} == 1;
 
         if (
-            $now->year == $date->year
-            && $now->month == $date->month
-            && $now->day == $date->day
+            $now->get_year() == $date->get_year()
+            && $now->get_month() == $date->get_month()
+            && $now->get_day() == $date->get_day()
         ) {
             $day->{color} = 'red';
         }
 
-
         if (($day->{number} == 1)) {
             push @week, '' foreach 1..get_day_number($date)-1;
-            $additional_text = ' 'x4 . $ru_month_names{$date->month()};
+            $additional_text = ' 'x4 . $ru_month_names{$date->get_month()};
         }
 
         if (@week == 7) {
@@ -94,7 +92,8 @@ sub print_month {
             print "\n";
         }
 
-        $date += '1D';
+
+        $date = $date->plus( day => 1 );
         push @week, $day;
     }
 
@@ -106,13 +105,13 @@ sub print_month {
 sub get_day_number {
     my ($d) = @_;
 
-    return 7 if $d->wday == 1;
-    return 1 if $d->wday == 2;
-    return 2 if $d->wday == 3;
-    return 3 if $d->wday == 4;
-    return 4 if $d->wday == 5;
-    return 5 if $d->wday == 6;
-    return 6 if $d->wday == 7;
+    return 1 if $d->is_monday();
+    return 2 if $d->is_tuesday();
+    return 3 if $d->is_wednesday();
+    return 4 if $d->is_thursday();
+    return 5 if $d->is_friday();
+    return 6 if $d->is_saturday();
+    return 7 if $d->is_sunday();
 
     croak;
 }
@@ -150,42 +149,55 @@ sub get_now {
 # main
 sub main {
 
-    $Class::Date::GMT_TIMEZONE = 'UTC';
-    my $utc_moment = get_now();
-    my $current_moment;
+    my $now = Moment->now();
 
-    my @tzs = qw(UTC Europe/Moscow);
-    my $current_tz = 'Europe/Moscow';
+    my @tzs = (
+        {
+            name => 'UTC',
+            hour => 0,
+            minute => 0,
+        },
+        {
+            name => 'Europe/Moscow',
+            hour => 3,
+            minute => 0,
+            current => $true,
+        },
+    );
 
     print "\n";
 
-    foreach my $tz (@tzs) {
-        my $this_moment = $utc_moment->to_tz($tz);
+    my $hour;
+    my $minute;
 
+    foreach my $tz (@tzs) {
         print
             " "x4
-            . $this_moment->strftime('%Y-%m-%d %H:%M:%S')
+            . $now->plus( hour => $tz->{hour}, minute => $tz->{minute})->get_dt()
             . " "
-            . $this_moment->tz
-            . ($tz eq $current_tz ? '  <---' : '')
+            . $tz->{name}
+            . ($tz->{current} ? '  <---' : '')
             . "\n"
             ;
 
-        if ($tz eq $current_tz) {
-            $current_moment = $this_moment;
+        if ($tz->{current}) {
+            $hour = $tz->{hour};
+            $minute = $tz->{minute};
         }
     }
 
+    $now = $now->plus( hour => $hour, minute => $minute );
+
     print "\n";
 
-    my $prev_month_first_date = (($current_moment->month_begin()) - '1D')->month_begin();
-    my $cur_month_first_date = $current_moment->month_begin();
-    my $next_month_first_date = $current_moment->month_end() + '1D';
+    my $prev_month_first_date = $now->get_month_start()->minus(day => 1)->get_month_start();
+    my $cur_month_first_date = $now->get_month_start();
+    my $next_month_first_date = $now->get_month_end()->plus(day => 1)->get_month_start();
 
     print_header();
-    print_month( first_date => $prev_month_first_date, now => $current_moment, ident => $true );
-    print_month( first_date => $cur_month_first_date, now => $current_moment, ident => $false );
-    print_month( first_date => $next_month_first_date, now => $current_moment, ident => $false );
+    print_month( first_date => $prev_month_first_date, now => $now, ident => $true );
+    print_month( first_date => $cur_month_first_date, now => $now, ident => $false );
+    print_month( first_date => $next_month_first_date, now => $now, ident => $false );
     print "\n\n";
 
 }

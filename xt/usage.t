@@ -7,19 +7,13 @@ use open qw(:std :utf8);
 
 use Test::More;
 use Test::Differences;
+use Test::MockTime qw( :all );
 
-use Class::Date qw(date);
 use Capture::Tiny qw(capture_merged);
 
 sub basic_usage {
 
-    my $now = date('2014-04-21 16:11:40');
-
-    no warnings 'once';
-    no warnings 'redefine';
-    *main::get_now = sub {
-        return $now;
-    };
+    set_absolute_time('2014-04-21T16:11:40Z');
 
     my $output = capture_merged {
         main();
@@ -31,7 +25,7 @@ sub basic_usage {
         $output,
 "
     2014-04-21 16:11:40 UTC
-    2014-04-21 20:11:40 Europe/Moscow  <---
+    2014-04-21 19:11:40 Europe/Moscow  <---
 
 Пн Вт Ср Чт Пт Сб Вс
                 1  2     март
@@ -58,13 +52,7 @@ sub basic_usage {
 
 sub end_of_month {
 
-    my $now = date('2014-03-30 16:11:40');
-
-    no warnings 'once';
-    no warnings 'redefine';
-    *main::get_now = sub {
-        return $now;
-    };
+    set_absolute_time('2014-03-30T16:11:40Z');
 
     my $output = capture_merged {
         main();
@@ -77,7 +65,7 @@ sub end_of_month {
         $output,
 "
     2014-03-30 16:11:40 UTC
-    2014-03-30 20:11:40 Europe/Moscow  <---
+    2014-03-30 19:11:40 Europe/Moscow  <---
 
 Пн Вт Ср Чт Пт Сб Вс
                 1  2     февраль
@@ -104,13 +92,7 @@ sub end_of_month {
 
 sub date_2014_05_31 {
 
-    my $now = date('2014-05-31 09:42:34');
-
-    no warnings 'once';
-    no warnings 'redefine';
-    *main::get_now = sub {
-        return $now;
-    };
+    set_absolute_time('2014-05-31T09:42:34Z');
 
     my $output = capture_merged {
         main();
@@ -123,7 +105,7 @@ sub date_2014_05_31 {
         $output,
 "
     2014-05-31 09:42:34 UTC
-    2014-05-31 13:42:34 Europe/Moscow  <---
+    2014-05-31 12:42:34 Europe/Moscow  <---
 
 Пн Вт Ср Чт Пт Сб Вс
     1  2  3  4  5  6     апрель
@@ -150,13 +132,7 @@ sub date_2014_05_31 {
 
 sub date_2014_08_02 {
 
-    my $now = date('2014-08-02 19:39:28');
-
-    no warnings 'once';
-    no warnings 'redefine';
-    *main::get_now = sub {
-        return $now;
-    };
+    set_absolute_time('2014-08-02T19:39:28Z');
 
     my $output = capture_merged {
         main();
@@ -168,7 +144,7 @@ sub date_2014_08_02 {
         $output,
 "
     2014-08-02 19:39:28 UTC
-    2014-08-02 23:39:28 Europe/Moscow  <---
+    2014-08-02 22:39:28 Europe/Moscow  <---
 
 Пн Вт Ср Чт Пт Сб Вс
     1  2  3  4  5  6     июль
@@ -195,13 +171,7 @@ sub date_2014_08_02 {
 
 sub date_2014_10_30 {
 
-    my $now = date('2014-10-30 19:39:28');
-
-    no warnings 'once';
-    no warnings 'redefine';
-    *main::get_now = sub {
-        return $now;
-    };
+    set_absolute_time('2014-10-30T19:39:28Z');
 
     my $output = capture_merged {
         main();
@@ -213,7 +183,7 @@ sub date_2014_10_30 {
         $output,
 "
     2014-10-30 19:39:28 UTC
-    2014-10-30 23:39:28 Europe/Moscow  <---
+    2014-10-30 22:39:28 Europe/Moscow  <---
 
 Пн Вт Ср Чт Пт Сб Вс
 
