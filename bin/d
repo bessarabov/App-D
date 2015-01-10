@@ -143,8 +143,76 @@ sub print_week {
     return $false;
 }
 
-sub get_now {
-    return gmdate(time);
+sub get_config {
+
+    my $config = {
+        tzs => [
+            {
+                name => 'UTC',
+                hour => 0,
+                minute => 0,
+                current => $false,
+            },
+        ],
+    };
+
+    my $config_file = $ENV{"HOME"} . '/.d';
+
+    if ( -e $config_file ) {
+        my @lines = read_file(
+            $config_file,
+            {
+                binmode => ':utf8',
+                chomp => $true,
+            },
+        );
+
+        my @tzs;
+
+        foreach my $line (@lines) {
+            if ( $line =~ /^\s*timezone\s*=/ ) {
+                $line =~ /
+                    ^
+                    \s*
+                    timezone
+                    \s*
+                    =
+                    \s*
+                    (?<name>.*)
+                    \s+
+                    (?<sign>[+-])
+                    (?<hour>[0-9]{2})
+                    :
+                    (?<minute>[0-9]{2})
+                    \s*
+                    (?<current>current)?
+                    \s*
+                    $
+                /x;
+
+                if ( $+{name} ) {
+                    push @tzs,
+                        {
+                            name => $+{name},
+                            hour => 0+( $+{sign} . (0+$+{hour}) ),
+                            minute => 0+ ( $+{sign} . (0+$+{minute}) ),
+                            current => !!$+{current},
+                        };
+                } else {
+                    print "Incorrect line '$line'\n";
+                    exit 1;
+                }
+
+            }
+        }
+
+
+        if (@tzs) {
+            $config->{tzs} = \@tzs;
+        }
+    }
+
+    return $config;
 }
 
 # main
@@ -152,19 +220,9 @@ sub main {
 
     my $now = Moment->now();
 
-    my @tzs = (
-        {
-            name => 'UTC',
-            hour => 0,
-            minute => 0,
-        },
-        {
-            name => 'Europe/Moscow',
-            hour => 3,
-            minute => 0,
-            current => $true,
-        },
-    );
+    my $config = get_config();
+
+    my @tzs = @{$config->{tzs}};
 
     print "\n";
 
