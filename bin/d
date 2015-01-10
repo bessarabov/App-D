@@ -18,6 +18,7 @@ use open qw(:std :utf8);
 use Carp qw(croak);
 use Moment qw();
 use Term::ANSIColor qw(colored);
+use File::Slurp qw(read_file);
 
 # global vars
 my $true = 1;
